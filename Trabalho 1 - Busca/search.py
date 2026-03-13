@@ -86,8 +86,6 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    from game import Directions
-    dict_directions = {'North': Directions.NORTH,'West': Directions.WEST, 'South':  Directions.SOUTH , 'East': Directions.EAST}
     
     # Variaveis para executar dfs
     visited = set()
@@ -98,7 +96,7 @@ def depthFirstSearch(problem):
     
     while True:
         state_tuple= stack.pop()
-        current_state, current_move, current_status, current_path  = state_tuple
+        current_state, current_move, current_cost, current_path  = state_tuple
         
         # Verifica se achou o objetivo
         if problem.isGoalState(current_state):
@@ -108,7 +106,7 @@ def depthFirstSearch(problem):
         visited.add(current_state)
         for v in problem.getSuccessors(current_state):
             if v[0] not in visited:
-                new_path = current_path + [dict_directions[current_move]]
+                new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
                 stack.append(new_list)
@@ -118,29 +116,30 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     from collections import deque
-    from game import Directions
-    dict_directions = {'North': Directions.NORTH,'West': Directions.WEST, 'South':  Directions.SOUTH , 'East': Directions.EAST}
 
     # Variaveis para executar bfs
-    visited = set()
-    # Fila de elementos
+    added_frontier = set()
+    # Fila de elemenaddedtos
     frontier = deque(list(i) for i in problem.getSuccessors(problem.getStartState()))
     for i in frontier:
+        added_frontier.add(i[0])
         i.append(list()) # Ira conter lista de movimentos ate resultado
     
     while True:
         state_tuple= frontier.popleft()
-        current_state, current_move, current_status, current_path  = state_tuple
+        current_state, current_move, current_cost, current_path  = state_tuple
 
         # Verifica se achou o objetivo
         if problem.isGoalState(current_state):
             return current_path + [current_move]
 
         # Senao continua explorando o caminho
-        visited.add(current_state)
+        added_frontier.add(current_state)
         for v in problem.getSuccessors(current_state):
-            if v[0] not in visited:
-                new_path = current_path + [dict_directions[current_move]]
+            if v[0] not in added_frontier:
+                added_frontier.add(v[0])
+                print(f"Novo termo: {v[0]}" )
+                new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
                 frontier.append(new_list)
@@ -148,8 +147,6 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    from game import Directions
-    dict_directions = {'North': Directions.NORTH,'West': Directions.WEST, 'South':  Directions.SOUTH , 'East': Directions.EAST}
 
     # Variaveis para executar bfs
     visited = set()
@@ -162,14 +159,14 @@ def uniformCostSearch(problem):
     while True:
         selected_index, smaller_cost = frontier[0], 999999
         for i in range(len(frontier)):
-            current_state, current_move, current_status, current_path  = frontier[i]
-            current_cost = problem.getCostOfActions(current_path + [dict_directions[current_move]])
+            current_state, current_move, current_cost, current_path  = frontier[i]
+            current_cost += problem.getCostOfActions(current_path)
             if current_cost < smaller_cost:
                 smaller_cost = current_cost
                 selected_index = i
             
         state_tuple= frontier.pop(selected_index)
-        current_state, current_move, current_status, current_path  = state_tuple
+        current_state, current_move, current_cost, current_path  = state_tuple
 
         # Verifica se achou o objetivo
         if problem.isGoalState(current_state):
@@ -179,7 +176,7 @@ def uniformCostSearch(problem):
         visited.add(current_state)
         for v in problem.getSuccessors(current_state):
             if v[0] not in visited:
-                new_path = current_path + [dict_directions[current_move]]
+                new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
                 frontier.append(new_list)
@@ -193,8 +190,6 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    from game import Directions
-    dict_directions = {'North': Directions.NORTH,'West': Directions.WEST, 'South':  Directions.SOUTH , 'East': Directions.EAST}
 
     # Variaveis para executar bfs
     visited = set()
@@ -207,14 +202,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     while True:
         selected_index, smaller_cost = frontier[0], 999999
         for i in range(len(frontier)):
-            current_state, current_move, current_status, current_path  = frontier[i]
-            current_cost = problem.getCostOfActions(current_path + [dict_directions[current_move]]) + heuristic(current_state, problem)
+            current_state, current_move, current_cost, current_path  = frontier[i]
+            current_cost = problem.getCostOfActions(current_path + [current_move]) + heuristic(current_state, problem)
             if current_cost < smaller_cost:
                 smaller_cost = current_cost
                 selected_index = i
             
         state_tuple= frontier.pop(selected_index)
-        current_state, current_move, current_status, current_path  = state_tuple
+        current_state, current_move, current_cost, current_path  = state_tuple
 
         # Verifica se achou o objetivo
         if problem.isGoalState(current_state):
@@ -224,7 +219,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         visited.add(current_state)
         for v in problem.getSuccessors(current_state):
             if v[0] not in visited:
-                new_path = current_path + [dict_directions[current_move]]
+                new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
                 frontier.append(new_list)
