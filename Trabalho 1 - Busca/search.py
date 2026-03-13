@@ -88,7 +88,7 @@ def depthFirstSearch(problem):
     """
     
     # Variaveis para executar dfs
-    visited = set()
+    visited = set(problem.getStartState())
     # Forma listas que contem 1 tupla dentro de cada uma
     stack = [list(i) for i in problem.getSuccessors(problem.getStartState())]
     for i in stack:
@@ -103,9 +103,9 @@ def depthFirstSearch(problem):
             return current_path + [current_move]
 
         # Senao continua explorando o caminho
-        visited.add(current_state)
         for v in problem.getSuccessors(current_state):
             if v[0] not in visited:
+                visited.add(v[0])
                 new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
@@ -118,27 +118,28 @@ def breadthFirstSearch(problem):
     from collections import deque
 
     # Variaveis para executar bfs
-    added_frontier = set()
+    added_frontier = set(problem.getStartState())
     # Fila de elemenaddedtos
     frontier = deque(list(i) for i in problem.getSuccessors(problem.getStartState()))
     for i in frontier:
         added_frontier.add(i[0])
+        print(f"Adicionado a fronteira: {i[0]}")
         i.append(list()) # Ira conter lista de movimentos ate resultado
     
     while True:
         state_tuple= frontier.popleft()
         current_state, current_move, current_cost, current_path  = state_tuple
+        print(f"Termo atual: {current_state}" )
 
         # Verifica se achou o objetivo
         if problem.isGoalState(current_state):
             return current_path + [current_move]
 
         # Senao continua explorando o caminho
-        added_frontier.add(current_state)
         for v in problem.getSuccessors(current_state):
             if v[0] not in added_frontier:
                 added_frontier.add(v[0])
-                print(f"Novo termo: {v[0]}" )
+                print(f"Novo termo na fronteira: {v[0]}" )
                 new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
