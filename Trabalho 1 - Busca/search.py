@@ -123,13 +123,11 @@ def breadthFirstSearch(problem):
     frontier = deque(list(i) for i in problem.getSuccessors(problem.getStartState()))
     for i in frontier:
         added_frontier.add(i[0])
-        print(f"Adicionado a fronteira: {i[0]}")
         i.append(list()) # Ira conter lista de movimentos ate resultado
     
     while True:
         state_tuple= frontier.popleft()
         current_state, current_move, current_cost, current_path  = state_tuple
-        print(f"Termo atual: {current_state}" )
 
         # Verifica se achou o objetivo
         if problem.isGoalState(current_state):
@@ -139,7 +137,6 @@ def breadthFirstSearch(problem):
         for v in problem.getSuccessors(current_state):
             if v[0] not in added_frontier:
                 added_frontier.add(v[0])
-                print(f"Novo termo na fronteira: {v[0]}" )
                 new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
@@ -150,23 +147,24 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
     # Variaveis para executar bfs
-    visited = set()
+    visited = set(problem.getStartState())
     # Fila de elementos
     frontier = [list(i) for i in problem.getSuccessors(problem.getStartState())]
     for i in frontier:
+        print(i[2], end = ' ')
         i.append(list()) # Ira conter lista de movimentos ate resultado
-    
 
     while True:
-        selected_index, smaller_cost = frontier[0], 999999
+        selected_index, smaller_cost = 0, frontier[0][2]
         for i in range(len(frontier)):
             current_state, current_move, current_cost, current_path  = frontier[i]
+            
             current_cost += problem.getCostOfActions(current_path)
+
             if current_cost < smaller_cost:
                 smaller_cost = current_cost
                 selected_index = i
-            
-        state_tuple= frontier.pop(selected_index)
+        state_tuple = frontier.pop(selected_index)
         current_state, current_move, current_cost, current_path  = state_tuple
 
         # Verifica se achou o objetivo
@@ -174,7 +172,6 @@ def uniformCostSearch(problem):
             return current_path + [current_move]
 
         # Senao continua explorando o caminho
-        visited.add(current_state)
         for v in problem.getSuccessors(current_state):
             if v[0] not in visited:
                 new_path = current_path + [current_move]
@@ -193,7 +190,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
 
     # Variaveis para executar bfs
-    visited = set()
+    visited = set(problem.getStartState())
     # Fila de elementos
     frontier = [list(i) for i in problem.getSuccessors(problem.getStartState())]
     for i in frontier:
