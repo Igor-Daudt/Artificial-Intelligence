@@ -193,8 +193,41 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+    dict_directions = {'North': Directions.NORTH,'West': Directions.WEST, 'South':  Directions.SOUTH , 'East': Directions.EAST}
+
+    # Variaveis para executar bfs
+    visited = set()
+    # Fila de elementos
+    frontier = [list(i) for i in problem.getSuccessors(problem.getStartState())]
+    for i in frontier:
+        i.append(list()) # Ira conter lista de movimentos ate resultado
+    
+
+    while True:
+        selected_index, smaller_cost = frontier[0], 999999
+        for i in range(len(frontier)):
+            current_state, current_move, current_status, current_path  = frontier[i]
+            current_cost = problem.getCostOfActions(current_path + [dict_directions[current_move]]) + heuristic(current_state, problem)
+            if current_cost < smaller_cost:
+                smaller_cost = current_cost
+                selected_index = i
+            
+        state_tuple= frontier.pop(selected_index)
+        current_state, current_move, current_status, current_path  = state_tuple
+
+        # Verifica se achou o objetivo
+        if problem.isGoalState(current_state):
+            return current_path + [current_move]
+
+        # Senao continua explorando o caminho
+        visited.add(current_state)
+        for v in problem.getSuccessors(current_state):
+            if v[0] not in visited:
+                new_path = current_path + [dict_directions[current_move]]
+                new_list = list(v)
+                new_list.append(new_path)
+                frontier.append(new_list)
 
 
 # Abbreviations
