@@ -151,19 +151,20 @@ def uniformCostSearch(problem):
     # Fila de elementos
     frontier = [list(i) for i in problem.getSuccessors(problem.getStartState())]
     for i in frontier:
-        print(i[2], end = ' ')
         i.append(list()) # Ira conter lista de movimentos ate resultado
 
     while True:
-        selected_index, smaller_cost = 0, frontier[0][2]
+        selected_index, smaller_cost = 0, frontier[0][2] + problem.getCostOfActions(frontier[0][3])
         for i in range(len(frontier)):
             current_state, current_move, current_cost, current_path  = frontier[i]
             
             current_cost += problem.getCostOfActions(current_path)
+            print(f"{current_cost}", end=" ")
 
             if current_cost < smaller_cost:
                 smaller_cost = current_cost
                 selected_index = i
+        
         state_tuple = frontier.pop(selected_index)
         current_state, current_move, current_cost, current_path  = state_tuple
 
@@ -172,12 +173,23 @@ def uniformCostSearch(problem):
             return current_path + [current_move]
 
         # Senao continua explorando o caminho
+        visited.add(current_state)
         for v in problem.getSuccessors(current_state):
-            if v[0] not in visited:
+            if v[0] not in visited and v[0] not in [i[0] for i in frontier]:
                 new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
                 frontier.append(new_list)
+            #  Se o item ja esta na fronteira, verifica se o caminho atual tem custo menor, se sim, substitui o item da fronteira
+            if v[0] in [i[0] for i in frontier]:
+                for i in frontier:
+                    if v[0] == i[0] and v[2] < i[2]:
+                        frontier.remove(i)
+                        new_path = current_path + [current_move]
+                        new_list = list(v)
+                        new_list.append(new_path)
+                        frontier.append(new_list)
+                        break
 
 def nullHeuristic(state, problem=None):
     """
