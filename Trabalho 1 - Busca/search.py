@@ -86,30 +86,35 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    
-    # Variaveis para executar dfs
-    visited = set(problem.getStartState())
-    # Forma listas que contem 1 tupla dentro de cada uma
-    stack = [list(i) for i in problem.getSuccessors(problem.getStartState())]
-    for i in stack:
+
+    from collections import deque
+
+    # Variaveis para executar bfs
+    added_frontier = set(problem.getStartState())
+    # Fila de elemenaddedtos
+    frontier = deque(list(i) for i in problem.getSuccessors(problem.getStartState()))
+    for i in frontier:
         i.append(list()) # Ira conter lista de movimentos ate resultado
-    
-    while True:
-        state_tuple= stack.pop()
+
+    while frontier:
+        state_tuple= frontier.pop()
         current_state, current_move, current_cost, current_path  = state_tuple
-        
+
         # Verifica se achou o objetivo
         if problem.isGoalState(current_state):
             return current_path + [current_move]
 
+        # Expande AQUI ANTES de vez de no final
+        if current_state not in added_frontier:
+            added_frontier.add(current_state)
+
         # Senao continua explorando o caminho
         for v in problem.getSuccessors(current_state):
-            if v[0] not in visited:
-                visited.add(v[0])
+            if v[0] not in added_frontier:
                 new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
-                stack.append(new_list)
+                frontier.append(new_list)
     
 
 def breadthFirstSearch(problem):
