@@ -90,7 +90,7 @@ def depthFirstSearch(problem):
     from collections import deque
 
     # Variaveis para executar bfs
-    added_frontier = set(problem.getStartState())
+    added_frontier = [problem.getStartState()]
     # Fila de elemenaddedtos
     frontier = deque(list(i) for i in problem.getSuccessors(problem.getStartState()))
     for i in frontier:
@@ -106,7 +106,7 @@ def depthFirstSearch(problem):
 
         # Expande AQUI ANTES de vez de no final
         if current_state not in added_frontier:
-            added_frontier.add(current_state)
+            added_frontier.append(current_state)
 
         # Senao continua explorando o caminho
         for v in problem.getSuccessors(current_state):
@@ -123,11 +123,11 @@ def breadthFirstSearch(problem):
     from collections import deque
 
     # Variaveis para executar bfs
-    added_frontier = set(problem.getStartState())
+    added_frontier = [problem.getStartState()]
     # Fila de elemenaddedtos
     frontier = deque(list(i) for i in problem.getSuccessors(problem.getStartState()))
     for i in frontier:
-        added_frontier.add(i[0])
+        added_frontier.append(i[0])
         i.append(list()) # Ira conter lista de movimentos ate resultado
     
     while True:
@@ -141,7 +141,7 @@ def breadthFirstSearch(problem):
         # Senao continua explorando o caminho
         for v in problem.getSuccessors(current_state):
             if v[0] not in added_frontier:
-                added_frontier.add(v[0])
+                added_frontier.append(v[0])
                 new_path = current_path + [current_move]
                 new_list = list(v)
                 new_list.append(new_path)
@@ -152,7 +152,7 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
     # Variaveis para executar bfs
-    visited = set(problem.getStartState())
+    visited = [problem.getStartState()]
     # Fila de elementos
     frontier = [list(i) for i in problem.getSuccessors(problem.getStartState())]
     for i in frontier:
@@ -177,7 +177,7 @@ def uniformCostSearch(problem):
             return current_path + [current_move]
 
         # Senao continua explorando o caminho
-        visited.add(current_state)
+        visited.append(current_state)
         for v in problem.getSuccessors(current_state):
             if v[0] not in visited and v[0] not in [i[0] for i in frontier]:
                 new_path = current_path + [current_move]
