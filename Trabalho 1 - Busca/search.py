@@ -164,7 +164,6 @@ def uniformCostSearch(problem):
             current_state, current_move, current_cost, current_path  = frontier[i]
             
             current_cost += problem.getCostOfActions(current_path)
-            print(f"{current_cost}", end=" ")
 
             if current_cost < smaller_cost:
                 smaller_cost = current_cost
@@ -206,39 +205,46 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
 
-    # Variaveis para executar bfs
-    visited = set(problem.getStartState())
-    # Fila de elementos
-    frontier = [list(i) for i in problem.getSuccessors(problem.getStartState())]
-    for i in frontier:
-        i.append(list()) # Ira conter lista de movimentos ate resultado
-    
+    # Helper function to calculate the priority abstracting the heuristic function
+    priority = lambda state, cost: cost + heuristic(state, problem)
 
-    while True:
-        selected_index, smaller_cost = frontier[0], 999999
-        for i in range(len(frontier)):
-            current_state, current_move, current_cost, current_path  = frontier[i]
-            current_cost = problem.getCostOfActions(current_path + [current_move]) + heuristic(current_state, problem)
-            if current_cost < smaller_cost:
-                smaller_cost = current_cost
-                selected_index = i
-            
-        state_tuple= frontier.pop(selected_index)
-        current_state, current_move, current_cost, current_path  = state_tuple
+    from util import PriorityQueue
 
-        # Verifica se achou o objetivo
-        if problem.isGoalState(current_state):
-            return current_path + [current_move]
+    start_state = problem.getStartState()
 
-        # Senao continua explorando o caminho
-        visited.add(current_state)
-        for v in problem.getSuccessors(current_state):
-            if v[0] not in visited:
-                new_path = current_path + [current_move]
-                new_list = list(v)
-                new_list.append(new_path)
-                frontier.append(new_list)
+    # Stores the lowest costs (g) until now
+    best_valued = {start_state: 0}
 
+    # Min-heap to pop the closest to 0 priority first
+    # total_cost = heur() + cost_from_start()
+    frontier = PriorityQueue()
+    frontier.push((start_state, [], 0), priority(start_state, 0))
+
+    while not frontier.isEmpty():
+        state, path, cost = frontier.pop()
+
+        # Guard to make sure it does not grab worse costs
+        if cost > best_valued[state]:
+            continue
+
+        # ..... Kinda obvious
+        if problem.isGoalState(state):
+            return path
+
+        for next, move, step_cost in problem.getSuccessors(state):
+            new_cost = cost + step_cost
+
+            # Checks the existance before accessing
+            if next not in best_valued or new_cost < best_valued[next]:
+
+                best_valued[next] = new_cost
+
+                # Updates the frontier
+                f_item = (next, path + [move], new_cost)
+                f_prior = priority(next, new_cost)
+                frontier.push(f_item, f_prior)
+
+    return []
 
 # Abbreviations
 bfs = breadthFirstSearch
