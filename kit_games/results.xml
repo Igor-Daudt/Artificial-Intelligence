@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<othello-match>
+	<timing start="Thu Apr  9 13:02:35 2026" finish="Thu Apr  9 13:03:58 2026"/>
+	<player directory="advsearch/humanplayer" color="B" result="draw" score="0"/>
+	<player directory="advsearch/your_agent" color="W" result="draw" score="0"/>
+	<moves>
+		<move coord="1,1" color="B"/>
+		<move coord="0,1" color="W"/>
+		<move coord="2,1" color="B"/>
+		<move coord="1,2" color="W"/>
+		<move coord="1,0" color="B"/>
+		<move coord="2,2" color="W"/>
+		<move coord="0,0" color="B"/>
+		<move coord="2,0" color="W"/>
+		<move coord="0,2" color="B"/>
+	</moves>
+</othello-match>
