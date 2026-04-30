@@ -32,12 +32,7 @@ def make_move(state) -> Tuple[int, int]:
     :return: (int, int) tuple with x, y coordinates of the move (remember: 0 is the first row/column)
     """
 
-    # o codigo abaixo apenas retorna um movimento aleatorio valido para
-    # a primeira jogada 
-    # Remova-o e coloque uma chamada para o minimax_move (que vc implementara' no modulo minimax).
-    # A chamada a minimax_move deve receber sua funcao evaluate como parametro.
-
-    return random.choice([(2, 3), (4, 5), (5, 4), (3, 2)])
+    return minimax_move(state, max_depth=3, eval_func=evaluate_mask)
 
 
 def evaluate_mask(state, player:str) -> float:
@@ -49,4 +44,29 @@ def evaluate_mask(state, player:str) -> float:
     :param state: state to evaluate (instance of GameState)
     :param player: player to evaluate the state for (B or W)
     """
-    return 0   # substitua pelo seu codigo
+    LINHAS_TABULEIRO = COLUNAS_TABULEIRO = 8
+
+    # Se o estado eh terminal, avalia
+    if state.is_terminal():
+        # Checar valor de vitoria ou derrota
+        winner = state.winner()
+        # Checar vitoria do jogador
+        if winner == player:
+            return 10000.0
+        # Checar empate
+        elif winner is None:
+            return 0.0
+        # Checar derrota do jogador
+        else:
+            return -10000.0
+        
+    # Calcular valor posicional do jogador
+    valor_posicional = 0
+    # String alterada para analise
+    tabuleiro_str = state.get_board().__str__().replace('\n', '')
+    for linha in range(LINHAS_TABULEIRO):
+        for coluna in range(COLUNAS_TABULEIRO):
+            if tabuleiro_str[linha * LINHAS_TABULEIRO + coluna] == player:
+                valor_posicional += EVAL_TEMPLATE[linha][coluna]
+    
+    return valor_posicional   # substitua pelo seu codigo

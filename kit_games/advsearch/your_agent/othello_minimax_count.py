@@ -18,12 +18,7 @@ def make_move(state) -> Tuple[int, int]:
     :return: (int, int) tuple with x, y coordinates of the move (remember: 0 is the first row/column)
     """
 
-    # o codigo abaixo apenas retorna um movimento aleatorio valido para
-    # a primeira jogada 
-    # Remova-o e coloque uma chamada para o minimax_move (que vc implementara' no modulo minimax).
-    # A chamada a minimax_move deve receber sua funcao evaluate como parametro.
-
-    return minimax_move(state, max_depth=4, eval_func=evaluate_count)
+    return minimax_move(state, max_depth=3, eval_func=evaluate_count)
 
 
 def evaluate_count(state, player:str) -> float:
