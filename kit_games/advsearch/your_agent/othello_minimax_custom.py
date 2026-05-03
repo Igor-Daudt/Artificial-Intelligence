@@ -11,6 +11,37 @@ from .othello_minimax_mask import evaluate_mask
 # Nao esqueca de renomear 'your_agent' com o nome
 # do seu agente.
 
+# So pode usar nos cantos
+def pecas_estaveis(board, player):
+    n = len(board.tiles[0])
+    tiles = board.tiles
+    bordas = (
+        [(0, c)   for c in range(n)] +
+        [(n-1, c) for c in range(n)] +
+        [(r, 0)   for r in range(1, n-1)] +
+        [(r, n-1) for r in range(1, n-1)]
+    )
+
+    num_estaveis = 0
+    # Para cada borda
+    for pos in bordas:
+        lin, col = pos 
+        if tiles[lin][col] == '.':
+            continue
+        # Em cada direcao
+        for direcao in board.DIRECTIONS:
+            # Verificar peca
+            verifica = [lin, col]
+            while True:
+                verifica[0] += direcao[0]
+                verifica[1] += direcao[1]
+                # chegou na extremidade = estavel
+                if not board.is_within_bounds(verifica):
+                    break 
+                 # encontrou adversário ou vazio antes = instavel
+                if tiles[verifica[0]][verifica[1]] != player:
+                    num_estaveis += 1
+    return num_estaveis
 
 def make_move(state) -> Tuple[int, int]:
     """
@@ -35,8 +66,6 @@ def evaluate_custom(state, player:str) -> float:
     :param state: state to evaluate (instance of GameState)
     :param player: player to evaluate the state for (B or W)
     """
-    # Um fator de posicao maior da mais importancia ao mask em comparacao com count
-    fator_de_posicao = 12
 
     if state.is_terminal():
         # Checar valor de vitoria ou derrota
@@ -51,12 +80,7 @@ def evaluate_custom(state, player:str) -> float:
         else:
             return -10000.0
         
-    # Obtem o valor das outras heuristicas
-    valor_mask = evaluate_mask(state, player)
-    board = state.get_board()
-    valor_contagem = board.num_pieces(player)
-    valor_contagem_oponente = board.num_pieces(board.opponent(player))
 
-    valor_exploracao = (valor_contagem + valor_contagem_oponente) / fator_de_posicao
+    # python kit_games/server.py othello advsearch/your_agent/othello_minimax_custom.py advsearch/your_agent/othello_minimax_count.py
 
-    return valor_exploracao * valor_contagem + valor_mask / valor_exploracao
+    return pecas_estaveis(state.get_board(), player) * 50
