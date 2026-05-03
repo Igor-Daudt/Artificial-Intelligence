@@ -52,6 +52,23 @@ def mobilidade(state):
     state.player = state.get_board().opponent(state.player)
     return movimentos_jogador - movimentos_oponente
 
+# Retorna a quantidade de cantos dominados pelo jogador
+def cantos_dominados(board, player):
+    n = len(board.tiles[0])
+    tiles = board.tiles
+
+    bordas = (
+        [(0, n-1)] +
+        [(n-1, 0)] +
+        [(0, 0)] +
+        [(n-1, n-1)]
+    )
+    qtd_cantos = 0
+    for i in bordas:
+        if tiles[i[0]][i[1]] == player:
+            qtd_cantos += 1
+    return qtd_cantos
+
 def make_move(state) -> Tuple[int, int]:
     """
     Returns a move for the given game state
@@ -92,4 +109,4 @@ def evaluate_custom(state, player:str) -> float:
 
     # python kit_games/server.py othello advsearch/your_agent/othello_minimax_custom.py advsearch/your_agent/othello_minimax_count.py
 
-    return mobilidade(state) * 5 + pecas_estaveis(state.get_board(), player) * 25
+    return mobilidade(state) * 5 + cantos_dominados(state.get_board(), player) * 25 + pecas_estaveis(state.get_board(), player) * 25
