@@ -43,6 +43,15 @@ def pecas_estaveis(board, player):
                     num_estaveis += 1
     return num_estaveis
 
+# Retorna a quantidade de movimentos possiveis do jogador menos
+# a quantidade de movimentos possiveis do oponente
+def mobilidade(state):
+    movimentos_jogador = len(state.legal_moves())
+    state.player = state.get_board().opponent(state.player)
+    movimentos_oponente = len(state.legal_moves())
+    state.player = state.get_board().opponent(state.player)
+    return movimentos_jogador - movimentos_oponente
+
 def make_move(state) -> Tuple[int, int]:
     """
     Returns a move for the given game state
@@ -83,4 +92,4 @@ def evaluate_custom(state, player:str) -> float:
 
     # python kit_games/server.py othello advsearch/your_agent/othello_minimax_custom.py advsearch/your_agent/othello_minimax_count.py
 
-    return pecas_estaveis(state.get_board(), player) * 50
+    return mobilidade(state) * 5 + pecas_estaveis(state.get_board(), player) * 25
