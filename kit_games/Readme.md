@@ -96,3 +96,18 @@ com todas as jogadas tentadas pelos jogadores (inclusive as ilegais). Um arquivo
 
 ISSO ABAIXO AINDA NAO FUNCIONA:
 Para ver o tabuleiro e as peças com cores, instale a biblioteca `pytermgui` (por exemplo, com `pip install pytermgui`) e execute o `server_tui.py` ao invés do `server.py`. 
+
+# Relatório
+## Nomes
+Gabriel Eichelberger Fontaneli - 00601480 - Turma A
+Rafaele Castagnara Alves - XXXXXXXX - Turma A
+Igor Daut - XXXXXXXX - Turma A
+
+## Avaliação
+Para validar a eficiência do algoritmo minimax no problema Tic-Tac-Toe Misere, é necessário responder três perguntas sobre sua eficiência:
+(i) O minimax sempre ganha ou empata jogando contra o randomplayer? Sim.
+(ii) O minimax sempre empata consigo mesmo? Sim.
+(iii) O minimax não perde para você quando você usa a sua melhor estratégia? Ele não perde.	
+Para obter a resposta das duas primeiras perguntas foi feito um código que calcula 100 vezes o resultado da execução do jogo, usando como jogadores, primeiramente, o algoritmo minimax contra o agente aleatório e, segundamente, o algoritmo minimax contra si próprio. 
+O resultado foi o seguinte:
+<img width="622" height="242" alt="image" src="https://github.com/user-attachments/assets/af7e4aaa-cdf3-43ca-8205-758a06c264aa" />
