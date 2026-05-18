@@ -23,9 +23,6 @@ torneio = [
     {"nome": "MCTS", 
     "path": "advsearch/your_agent/mcts.py", 
     "vitorias": 0}
-    # {"nome": "MCTS", 
-    # "path": "advsearch/your_agent/mcts.py", 
-    # "vitorias": 0}
 ]
 historico = []
 # valor de diferentes heuristicas
