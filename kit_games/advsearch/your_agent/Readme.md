@@ -4,7 +4,7 @@ Gabriel Eichelberger Fontaneli - 00601480 - Turma A
 
 Rafaele Castagnara Alves - 00600867 - Turma A
 
-Igor Daut - 0059927X - Turma A
+Igor Bernardo Daudt - 0059927X - Turma A
 
 ## Avaliação
 
