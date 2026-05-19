@@ -161,6 +161,3 @@ Como extra, foi implementado o algoritmo do MCTS (Monte Carlo Tree Search) e sua
 4.BACK-PROPAGATE: O resultado da simulação sobe de volta até a raiz, atualizando as estatísticas de vitórias e visitas de cada nó no caminho. Se o estado for terminal, retorna 1 para vitória, 0.5 para empate e 0 para derrota. Caso o estado não seja terminal, retorna o valor da heurística de Valor Posicional convertida para uma escala de 0 a 1.
 Quando o tempo de execução limite termina, o loop principal é interrompido e a função retorna a jogada do filho com o maior número de visitas.
 
-4 CONCLUSÃO
-
-Após testes, é possível concluir que o algoritmo minimax está funcionando de maneira ótima. 
