@@ -4,10 +4,9 @@ Gabriel Eichelberger Fontaneli - 00601480 - Turma A
 
 Rafaele Castagnara Alves - 00600867 - Turma A
 
-Igor Daut - XXXXXXXX - Turma A
+Igor Daut - 0059927X - Turma A
 
 ## Avaliação
-https://docs.google.com/document/d/1s4GK3X-TBvSQau4x4FD3lZnHhxz5TqMd_Ma0pDckeUY/edit?tab=t.0
 
 *1 INTRODUÇÃO*
 
@@ -155,9 +154,13 @@ No início do meio do jogo (entre 20 e 30 peças no tabuleiro), a estratégia co
 *Extras:*
 
 Como extra, foi implementado o algoritmo do MCTS (Monte Carlo Tree Search) e suas 4 fases da seguinte maneira: 
+
 1.SELECT: Partindo da raiz, o algoritmo desce pela árvore escolhendo os nós filhos até encontrar um nó que não esteja totalmente expandido ou que seja o fim do jogo. A política de seleção foi implementada no método best_child() e usa da heurística UCT (Upper Confidence Bound for Trees), que foi vista em aula, o valor escolhido para a constante C foi 1.41, pois ele é considerado o valor padrão teórico.
+
 2.EXPAND: Quando o algoritmo encontra um nó que ainda tem jogadas não testadas (untried_moves), ele sorteia uma dessas jogadas aleatoriamente usando random.choice(). Essa jogada é removida da lista de não tentadas, o novo estado do tabuleiro é gerado (next_state) e um novo nodo (MCTSNode) é criado e anexado como filho do estado atual.
+
 3.SIMULATE: A partir do novo nó expandido, o algoritmo joga partidas aleatórias para ver qual seria o resultado com limite de profundidade 7.
+
 4.BACK-PROPAGATE: O resultado da simulação sobe de volta até a raiz, atualizando as estatísticas de vitórias e visitas de cada nó no caminho. Se o estado for terminal, retorna 1 para vitória, 0.5 para empate e 0 para derrota. Caso o estado não seja terminal, retorna o valor da heurística de Valor Posicional convertida para uma escala de 0 a 1.
 Quando o tempo de execução limite termina, o loop principal é interrompido e a função retorna a jogada do filho com o maior número de visitas.
 
