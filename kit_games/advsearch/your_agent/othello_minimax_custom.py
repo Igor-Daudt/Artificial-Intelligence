@@ -10,65 +10,6 @@ from .othello_minimax_mask import evaluate_mask
 #
 # Nao esqueca de renomear 'your_agent' com o nome
 # do seu agente.
-
-# So pode usar nos cantos
-def pecas_estaveis(board, player):
-    n = len(board.tiles[0])
-    tiles = board.tiles
-    bordas = (
-        [(0, c)   for c in range(n)] +
-        [(n-1, c) for c in range(n)] +
-        [(r, 0)   for r in range(1, n-1)] +
-        [(r, n-1) for r in range(1, n-1)]
-    )
-
-    num_estaveis = 0
-    # Para cada borda
-    for pos in bordas:
-        lin, col = pos 
-        if tiles[lin][col] == '.':
-            continue
-        # Em cada direcao
-        for direcao in board.DIRECTIONS:
-            # Verificar peca
-            verifica = [lin, col]
-            while True:
-                verifica[0] += direcao[0]
-                verifica[1] += direcao[1]
-                # chegou na extremidade = estavel
-                if not board.is_within_bounds(verifica):
-                    break 
-                 # encontrou adversário ou vazio antes = instavel
-                if tiles[verifica[0]][verifica[1]] != player:
-                    num_estaveis += 1
-    return num_estaveis
-
-# Retorna a quantidade de movimentos possiveis do jogador menos
-# a quantidade de movimentos possiveis do oponente
-def mobilidade(state):
-    movimentos_jogador = len(state.legal_moves())
-    state.player = state.get_board().opponent(state.player)
-    movimentos_oponente = len(state.legal_moves())
-    state.player = state.get_board().opponent(state.player)
-    return movimentos_jogador - movimentos_oponente
-
-# Retorna a quantidade de cantos dominados pelo jogador
-def cantos_dominados(board, player):
-    n = len(board.tiles[0])
-    tiles = board.tiles
-
-    bordas = (
-        [(0, n-1)] +
-        [(n-1, 0)] +
-        [(0, 0)] +
-        [(n-1, n-1)]
-    )
-    qtd_cantos = 0
-    for i in bordas:
-        if tiles[i[0]][i[1]] == player:
-            qtd_cantos += 1
-    return qtd_cantos
-
 def make_move(state) -> Tuple[int, int]:
     """
     Returns a move for the given game state
@@ -83,30 +24,89 @@ def make_move(state) -> Tuple[int, int]:
 
     return minimax_move(state, max_depth=3, eval_func=evaluate_custom)
 
+EVAL_TEMPLATE = [
+    [100, -30, 6, 2, 2, 6, -30, 100],
+    [-30, -50, 1, 1, 1, 1, -50, -30],
+    [  6,   1, 1, 1, 1, 1,   1,   6],
+    [  2,   1, 1, 3, 3, 1,   1,   2],
+    [  2,   1, 1, 3, 3, 1,   1,   2],
+    [  6,   1, 1, 1, 1, 1,   1,   6],
+    [-30, -50, 1, 1, 1, 1, -50, -30],
+    [100, -30, 6, 2, 2, 6, -30, 100]
+]
+def evaluate_mask(state, player:str) -> float:
 
-def evaluate_custom(state, player:str) -> float:
     """
     Evaluates an othello state from the point of view of the given player. 
     If the state is terminal, returns its utility. 
-    If non-terminal, returns an estimate of its value based on your custom heuristic
+    If non-terminal, returns an estimate of its value based on the positional value of the pieces.
+    You must use the EVAL_TEMPLATE above to compute the positional value of the pieces.
     :param state: state to evaluate (instance of GameState)
     :param player: player to evaluate the state for (B or W)
     """
 
+    LINHAS_TABULEIRO = COLUNAS_TABULEIRO = 8
+    opponent = 'W' if player == 'B' else 'B'
+    
+    # Calcular valor posicional do jogador
+    valor_posicional = 0
+    # String alterada para analise
+    tabuleiro_str = state.get_board().__str__().replace('\n', '')
+    
+    for linha in range(LINHAS_TABULEIRO):
+        for coluna in range(COLUNAS_TABULEIRO):
+            peca = tabuleiro_str[linha * LINHAS_TABULEIRO + coluna]
+            if peca == player:
+                valor_posicional += EVAL_TEMPLATE[linha][coluna]
+            elif peca == opponent:
+                valor_posicional -= EVAL_TEMPLATE[linha][coluna]
+                
+    return float(valor_posicional)
+
+def evaluate_custom(state, player:str) -> float:
     if state.is_terminal():
-        # Checar valor de vitoria ou derrota
         winner = state.winner()
-        # Checar vitoria do jogador
-        if winner == player:
-            return 10000.0
-        # Checar empate
-        elif winner is None:
-            return 0.0
-        # Checar derrota do jogador
-        else:
-            return -10000.0
+        if winner == player: return 10000.0
+        elif winner != player and winner is not None and winner != '-' and winner != 'Draw': return -10000.0
+        else: return 0.0
         
+    opponent = 'W' if player == 'B' else 'B'
+    board = state.get_board()
+    
+    my_pieces = board.num_pieces(player)
+    opp_pieces = board.num_pieces(opponent)
+    total_pieces = my_pieces + opp_pieces
+    
+    # Usamos a base da heuristica posicional
+    valor_mascara = evaluate_mask(state, player)
+                
+    # Se for a vez do player, contamos as jogadas legais dele.
+    # Quanto mais mobilidade pro player melhor, quanto menos mobilidade para o oponente pior
+    mobilidade = 0
+    if state.player == player:
+        mobilidade = len(list(state.legal_moves())) * 10  # Peso 10 para mobilidade
+    else:
+        mobilidade = -len(list(state.legal_moves())) * 10
+        
+    #Diferentes pontuacoes para cada parte do jogo
+    if total_pieces < 20:
+        # Inicio: Foco na máscara e mobilidade. Ter muitas peças eh ruim.
+        pontuacao = valor_mascara + mobilidade - (my_pieces * 2) 
+    
+    elif total_pieces <= 30:
+        # Inicio do meio: Foco absoluto na máscara e mobilidade extrema.
+        pontuacao = valor_mascara + mobilidade
 
-    # python kit_games/server.py othello advsearch/your_agent/othello_minimax_custom.py advsearch/your_agent/othello_minimax_count.py
+    elif total_pieces <= 40:
+        # Meio do jogo: Foco na máscara e mobilidade porém considerando um pouco as peças.
+        pontuacao = valor_mascara + mobilidade + (my_pieces - opp_pieces)*2
+    
+    elif total_pieces <= 50:
+        # Inicio do fim: Ainda importante do valor da mascara e mobilidade mas considerando mais a máscara.
+        pontuacao = valor_mascara + mobilidade + (my_pieces - opp_pieces)*5
 
-    return mobilidade(state) * 5 + cantos_dominados(state.get_board(), player) * 25 + pecas_estaveis(state.get_board(), player) * 25
+    else:
+        # Fim: A máscara perde importância. Contagem de peças eh muito mais importante.
+        pontuacao = (my_pieces - opp_pieces) * 100 
+        
+    return float(pontuacao)
