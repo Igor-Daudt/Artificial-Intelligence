@@ -1,0 +1,5 @@
+*.txt
+*.pyc
+*.xml
+
+__pycache__
