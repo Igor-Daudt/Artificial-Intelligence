@@ -1,9 +1,7 @@
 *.txt
 *.pyc
-<<<<<<< HEAD
 *.xml
 
 __pycache__
 =======
 *.xml
->>>>>>> 840a4e4278fe2462681a37f5d0b56b6cc62182b6
