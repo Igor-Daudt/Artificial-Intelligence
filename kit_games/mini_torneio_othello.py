@@ -36,6 +36,7 @@ for i in range(n):
             print(f"{nome1} X {nome2}")
             p1 = h1["path"]
             p2 = h2["path"]
+
             for k in range(0,3):
                 s = Server("othello", p1, p2, 5, "historia.txt", "output.txt", 0)
                 s.run()
