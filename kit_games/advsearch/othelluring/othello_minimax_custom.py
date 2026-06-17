@@ -139,4 +139,3 @@ def evaluate_custom(state, player:str) -> float:
         diferenca_pecas = (my_pieces - opp_pieces) * 100
         return float(diferenca_pecas + cantos)
         
-    

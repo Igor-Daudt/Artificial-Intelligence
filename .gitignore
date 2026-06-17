@@ -1,3 +1,7 @@
 *.txt
 *.pyc
 *.xml
+
+__pycache__
+=======
+*.xml
