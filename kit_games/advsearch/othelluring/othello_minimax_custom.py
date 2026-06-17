@@ -10,6 +10,43 @@ from .othello_minimax_mask import evaluate_mask
 #
 # Nao esqueca de renomear 'your_agent' com o nome
 # do seu agente.
+
+
+# Retorna a quantidade de movimentos possiveis do jogador menos
+# a quantidade de movimentos possiveis do oponente
+def calcula_mobilidade(state, player):
+    if state.player == player:
+        movimentos_jogador = len(state.legal_moves())
+        state.player = state.get_board().opponent(state.player)
+        movimentos_oponente = len(state.legal_moves())
+        state.player = state.get_board().opponent(state.player)
+    else:
+        movimentos_oponente = len(state.legal_moves())
+        state.player = state.get_board().opponent(state.player)
+        movimentos_jogador = len(state.legal_moves())
+        state.player = state.get_board().opponent(state.player)
+    return float(movimentos_jogador - movimentos_oponente)
+
+# Retorna a quantidade de cantos dominados pelo jogador
+def cantos_dominados(board, player, opponent):
+    n = len(board.tiles[0])
+    tiles = board.tiles
+
+    bordas = (
+        [(0, n-1)] +
+        [(n-1, 0)] +
+        [(0, 0)] +
+        [(n-1, n-1)]
+    )
+    qtd_cantos_player = 0
+    qtd_cantos_oponente = 0
+    for i in bordas:
+        if tiles[i[0]][i[1]] == player:
+            qtd_cantos_player += 1
+        elif tiles[i[0]][i[1]] == opponent:
+            qtd_cantos_oponente += 1
+    return (qtd_cantos_player - qtd_cantos_oponente)
+
 def make_move(state) -> Tuple[int, int]:
     """
     Returns a move for the given game state
@@ -24,6 +61,9 @@ def make_move(state) -> Tuple[int, int]:
 
     return minimax_move(state, max_depth=3, eval_func=evaluate_custom)
 
+
+
+
 EVAL_TEMPLATE = [
     [100, -30, 6, 2, 2, 6, -30, 100],
     [-30, -50, 1, 1, 1, 1, -50, -30],
@@ -34,7 +74,7 @@ EVAL_TEMPLATE = [
     [-30, -50, 1, 1, 1, 1, -50, -30],
     [100, -30, 6, 2, 2, 6, -30, 100]
 ]
-def evaluate_mask(state, player:str) -> float:
+def evaluate_mask(board, player, opponent) -> float:
 
     """
     Evaluates an othello state from the point of view of the given player. 
@@ -46,16 +86,14 @@ def evaluate_mask(state, player:str) -> float:
     """
 
     LINHAS_TABULEIRO = COLUNAS_TABULEIRO = 8
-    opponent = 'W' if player == 'B' else 'B'
     
     # Calcular valor posicional do jogador
     valor_posicional = 0
-    # String alterada para analise
-    tabuleiro_str = state.get_board().__str__().replace('\n', '')
+    tabuleiro_str = board.tiles
     
     for linha in range(LINHAS_TABULEIRO):
         for coluna in range(COLUNAS_TABULEIRO):
-            peca = tabuleiro_str[linha * LINHAS_TABULEIRO + coluna]
+            peca = tabuleiro_str[linha][coluna]
             if peca == player:
                 valor_posicional += EVAL_TEMPLATE[linha][coluna]
             elif peca == opponent:
@@ -73,40 +111,31 @@ def evaluate_custom(state, player:str) -> float:
     opponent = 'W' if player == 'B' else 'B'
     board = state.get_board()
     
+    # 1. PEGA OS DADOS BASE
     my_pieces = board.num_pieces(player)
     opp_pieces = board.num_pieces(opponent)
     total_pieces = my_pieces + opp_pieces
     
-    # Usamos a base da heuristica posicional
-    valor_mascara = evaluate_mask(state, player)
+    # 2. CALCULA A MÁSCARA E CANTOS
+    valor_mascara = evaluate_mask(board, player, opponent)
+    cantos = cantos_dominados(board, player, opponent) * 150
                 
+    # 3. CONDIÇÃO DE MOBILIDADE 
     # Se for a vez do player, contamos as jogadas legais dele.
     # Quanto mais mobilidade pro player melhor, quanto menos mobilidade para o oponente pior
-    mobilidade = 0
-    if state.player == player:
-        mobilidade = len(list(state.legal_moves())) * 10  # Peso 10 para mobilidade
-    else:
-        mobilidade = -len(list(state.legal_moves())) * 10
+    mobilidade = calcula_mobilidade(state, player)
         
-    #Diferentes pontuacoes para cada parte do jogo
+    # 4. TRANSIÇÃO DINÂMICA DE FASES 
     if total_pieces < 20:
-        # Inicio: Foco na máscara e mobilidade. Ter muitas peças eh ruim.
-        pontuacao = valor_mascara + mobilidade - (my_pieces * 2) 
-    
-    elif total_pieces <= 30:
-        # Inicio do meio: Foco absoluto na máscara e mobilidade extrema.
-        pontuacao = valor_mascara + mobilidade
-
-    elif total_pieces <= 40:
-        # Meio do jogo: Foco na máscara e mobilidade porém considerando um pouco as peças.
-        pontuacao = valor_mascara + mobilidade + (my_pieces - opp_pieces)*2
-    
-    elif total_pieces <= 50:
-        # Inicio do fim: Ainda importante do valor da mascara e mobilidade mas considerando mais a máscara.
-        pontuacao = valor_mascara + mobilidade + (my_pieces - opp_pieces)*5
-
-    else:
-        # Fim: A máscara perde importância. Contagem de peças eh muito mais importante.
-        pontuacao = (my_pieces - opp_pieces) * 100 
+        # INÍCIO DO JOGO: Foco na máscara e mobilidade. Ter muitas peças é ruim.
+        return float(valor_mascara + mobilidade * 10 + cantos - (my_pieces * 5))
         
-    return float(pontuacao)
+    elif total_pieces <= 50:
+        # MEIO DO JOGO: Foco absoluto na máscara e mobilidade extrema.
+        return float(valor_mascara + mobilidade * 10 + cantos)
+        
+    else:
+        # FIM DE JOGO: A máscara perde importância. Contagem de peças dita o vencedor.
+        diferenca_pecas = (my_pieces - opp_pieces) * 100
+        return float(diferenca_pecas + cantos)
+        

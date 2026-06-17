@@ -11,18 +11,15 @@ from server import Server
 
 # teste do agente minimax contra o jogador random
 torneio = [
-    {"nome": "Contagem de peças", 
-    "path": "advsearch/your_agent/othello_minimax_count.py", 
-    "vitorias": 0},
     {"nome": "Valor posicional", 
-    "path": "advsearch/your_agent/othello_minimax_mask.py", 
+    "path": "advsearch/othelluring/othello_minimax_mask.py", 
     "vitorias": 0},
     {"nome": "Heurística customizada", 
-    "path": "advsearch/your_agent/othello_minimax_custom.py", 
+    "path": "advsearch/othelluring/tournament_agent.py", 
     "vitorias": 0},
-    {"nome": "MCTS", 
-    "path": "advsearch/your_agent/mcts.py", 
-    "vitorias": 0}
+    # {"nome": "MCTS", 
+    # "path": "advsearch/your_agent/mcts.py", 
+    # "vitorias": 0}
 ]
 historico = []
 # valor de diferentes heuristicas
@@ -39,21 +36,8 @@ for i in range(n):
             print(f"{nome1} X {nome2}")
             p1 = h1["path"]
             p2 = h2["path"]
-<<<<<<< HEAD
-            s = Server("othello", p1, p2, 5, "historia.txt", "output.txt", 0)
-            s.run()
-            if s.result == 0:
-                print(f"Vitória da heurística: {nome1}")
-                historico.append(f"Vitória da heurística: {nome1} sobre a heurísitca {nome2}")
-                h1["vitorias"] += 1 
-            elif s.result == 1:
-                print(f"Vitória da heurística: {nome2}")
-                historico.append(f"Vitória da heurística: {nome2} sobre a heurísitca {nome1}")
-                h2["vitorias"] += 1
-            else:
-                print("Empate")
-=======
-            for k in range(0,10):
+
+            for k in range(0,3):
                 s = Server("othello", p1, p2, 5, "historia.txt", "output.txt", 0)
                 s.run()
                 if s.result == 0:
@@ -66,7 +50,6 @@ for i in range(n):
                     h2["vitorias"] += 1
                 else:
                     print("Empate")
->>>>>>> 840a4e4278fe2462681a37f5d0b56b6cc62182b6
 print("----- Estatísticas ------")
 for i in range(n):
     nome = torneio[i]["nome"]
