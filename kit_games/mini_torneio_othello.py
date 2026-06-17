@@ -12,10 +12,10 @@ from server import Server
 # teste do agente minimax contra o jogador random
 torneio = [
     {"nome": "Valor posicional", 
-    "path": "advsearch/your_agent/othello_minimax_mask.py", 
+    "path": "advsearch/othelluring/othello_minimax_mask.py", 
     "vitorias": 0},
     {"nome": "Heurística customizada", 
-    "path": "advsearch/your_agent/othello_minimax_custom.py", 
+    "path": "advsearch/othelluring/tournament_agent.py", 
     "vitorias": 0},
     # {"nome": "MCTS", 
     # "path": "advsearch/your_agent/mcts.py", 
