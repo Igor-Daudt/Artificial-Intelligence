@@ -30,3 +30,6 @@ if __name__ == '__main__':
     for q in [q for q in dir(analysis) if q.startswith('question')]:
         response = getattr(analysis, q)()
         print('  Question %s:\t%s' % (q, str(response)))
+
+def question6():
+    return 'NOT POSSIBLE'
